@@ -15,3 +15,6 @@ As part of a 4-member University of Maryland TLP team, we analyzed publicly avai
 - Designed a rubric-style framework for evaluating maternal health apps
 - Created a project website to present the findings
 
+## How to see the website
+
+Download the html
