@@ -1,0 +1,1232 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- HTML setup: tells the browser this is a responsive English web page. -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TLP@UMD | Maternal Risk Prediction</title>
+
+  <!-- CSS starts here: everything inside this style tag controls the page design. -->
+  <style>
+    /* Font import: Syne is used for bold titles, Inter is used for readable body text. */
+    @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=Inter:wght@300;400;500;600&display=swap');
+
+    /* Reset: removes default browser spacing so the design is easier to control. */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* Color system: change these values if you want to recolor the whole site. */
+    :root {
+      --bg: #12000b;                  /* Main page background color. */
+      --bg-panel: #3a1230;            /* Card and panel background color. */
+      --bg-panel-hover: #521a43;      /* Card background color on hover. */
+      --accent: #ff1493;              /* Main bold pink accent color. */
+      --accent-bright: #ffffff;       /* Bright highlight color for important text. */
+      --accent-soft: rgba(255, 20, 147, 0.42); /* Soft pink background for pills and photo placeholders. */
+      --text: #ffffff;                /* Main text color. */
+      --muted: #ffe8f4;               /* Paragraph and secondary text color. */
+      --soft: #ffd0e7;                /* Small label text color. */
+      --border: rgba(255, 105, 180, 0.7); /* Thin divider and card border color. */
+      --border-strong: rgba(255, 182, 220, 0.95); /* Stronger border for highlighted areas. */
+      --green: #ccffb8;               /* Badge color for strong model results. */
+      --gold: #ffe891;                /* Badge color for okay model results. */
+      --red: #ffb3bf;                 /* Badge color for weak model results. */
+    }
+
+    /* Page base: controls the default font, background, and readable line spacing. */
+    html {
+      font-size: 18px;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background:
+        radial-gradient(circle at top right, rgba(255, 20, 147, 0.55), transparent 34rem),
+        radial-gradient(circle at left 45rem, rgba(255, 194, 221, 0.24), transparent 30rem),
+        linear-gradient(135deg, rgba(255, 20, 147, 0.18), rgba(255, 255, 255, 0.03)),
+        var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    /* Navigation: sticky top bar with page links. */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+      padding: 1.35rem 3rem;
+      background: rgba(18, 0, 11, 0.84);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(14px);
+    }
+
+    /* Logo text: this is where the project name appears in the top left. */
+    .nav-logo {
+      color: var(--text);
+      font-family: 'Syne', sans-serif;
+      font-size: 1.22rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+    }
+
+    /* Navigation links: controls Problem, Model, Data, and Team link styling. */
+    .nav-links {
+      display: flex;
+      gap: 1.1rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      font-size: 0.76rem;
+      letter-spacing: 0.08em;
+      text-decoration: none;
+      text-transform: uppercase;
+      transition: color 0.2s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--accent-bright);
+    }
+
+    /* Date pill: this is the small Spring 2026 label in the nav. */
+    .nav-pill {
+      padding: 6px 15px;
+      color: var(--accent-bright);
+      background: var(--accent-soft);
+      border: 1px solid var(--border-strong);
+      border-radius: 20px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      box-shadow: 0 0 24px rgba(255, 20, 147, 0.45);
+    }
+
+    /* Hero section: the large first screen with the main message. */
+    .hero {
+      position: relative;
+      max-width: 1100px;
+      min-height: 90vh;
+      margin: 0 auto;
+      padding: 8rem 3rem 6rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    /* Hero glow: decorative pink light behind the headline. */
+    .hero-glow {
+      position: absolute;
+      top: -120px;
+      right: -100px;
+      width: 520px;
+      height: 520px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 20, 147, 0.7), transparent 68%);
+      pointer-events: none;
+    }
+
+    /* Eyebrow text: small uppercase label above major headings. */
+    .hero-eyebrow,
+    .section-eyebrow {
+      color: var(--accent-bright);
+      font-size: 0.86rem;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .hero-eyebrow {
+      margin-bottom: 1.5rem;
+    }
+
+    /* Main headline: controls the large hero title. */
+    .hero h1 {
+      margin-bottom: 2rem;
+      color: var(--text);
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(3.5rem, 8vw, 5.7rem);
+      font-weight: 800;
+      line-height: 0.96;
+    }
+
+    /* Highlighted word in the hero headline. */
+    .hero h1 span {
+      color: var(--accent-bright);
+      text-shadow: 0 0 44px rgba(255, 20, 147, 0.95);
+    }
+
+    /* Hero description: bigger paragraph text for readability. */
+    .hero-desc {
+      max-width: 640px;
+      margin-bottom: 3.5rem;
+      color: var(--muted);
+      font-size: 1.15rem;
+      font-weight: 400;
+      line-height: 1.85;
+    }
+
+    /* Hero stats: row of project numbers under the intro paragraph. */
+    .hero-stats {
+      display: flex;
+      gap: 3rem;
+      padding-top: 2.5rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .hstat .n {
+      color: var(--accent);
+      font-family: 'Syne', sans-serif;
+      font-size: 2.3rem;
+      font-weight: 700;
+    }
+
+    .hstat .l {
+      margin-top: 3px;
+      color: var(--soft);
+      font-size: 0.88rem;
+      letter-spacing: 0.03em;
+    }
+
+    /* Marquee: scrolling keyword strip below the hero. */
+    .marquee-wrap {
+      padding: 1rem 0;
+      overflow: hidden;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      background: rgba(255, 20, 147, 0.24);
+    }
+
+    .marquee-inner {
+      display: flex;
+      gap: 3rem;
+      white-space: nowrap;
+      animation: marquee 20s linear infinite;
+    }
+
+    .marquee-inner span {
+      color: var(--muted);
+      font-size: 0.84rem;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+    }
+
+    .marquee-inner .dot {
+      color: var(--accent);
+      font-size: 1rem;
+    }
+
+    /* Marquee animation: moves the keyword row sideways forever. */
+    @keyframes marquee {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* Shared section layout: used by Problem, Model, Data, and Team sections. */
+    .section {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 7rem 3rem;
+    }
+
+    .section-title {
+      margin: 1rem 0;
+      color: var(--text);
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2.3rem, 5vw, 3.25rem);
+      font-weight: 700;
+      line-height: 1.1;
+    }
+
+    .section-sub {
+      max-width: 680px;
+      color: var(--muted);
+      font-size: 1.08rem;
+      font-weight: 400;
+      line-height: 1.85;
+    }
+
+    /* Divider line: separates large sections. */
+    .ruled {
+      border: none;
+      border-top: 1px solid var(--border);
+    }
+
+    /* Problem cards: the three cards explaining the problem and solution. */
+    .cards3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      margin-top: 3.5rem;
+      overflow: hidden;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+    }
+
+    .card3 {
+      padding: 2rem;
+      background: var(--bg-panel);
+      transition: background 0.3s ease;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+    }
+
+    .card3:hover {
+      background: var(--bg-panel-hover);
+    }
+
+    .card3-num {
+      margin-bottom: 1.2rem;
+      color: var(--accent);
+      font-family: 'Syne', sans-serif;
+      font-size: 0.78rem;
+      letter-spacing: 0.14em;
+    }
+
+    .card3 h3,
+    .feat-item h4 {
+      margin-bottom: 0.6rem;
+      color: var(--text);
+      font-size: 1.12rem;
+      font-weight: 600;
+    }
+
+    .card3 p,
+    .feat-item p {
+      color: var(--muted);
+      font-size: 0.98rem;
+      line-height: 1.75;
+    }
+
+    /* Model block: contains the model performance rows and progress bars. */
+    .model-block {
+      margin-top: 3rem;
+      padding: 2.5rem;
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: 0 18px 70px rgba(255, 20, 147, 0.38);
+    }
+
+    .model-row {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      padding: 1.1rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .model-row:last-child {
+      border-bottom: none;
+    }
+
+    /* Winner row: makes XGBoost stand out. */
+    .model-row.winner {
+      margin: 0 -2.5rem;
+      padding: 1.1rem 2.5rem;
+      background: rgba(255, 20, 147, 0.36);
+    }
+
+    .model-name {
+      min-width: 150px;
+      color: var(--text);
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .model-name.dim {
+      color: var(--muted);
+      font-weight: 400;
+    }
+
+    /* Progress bar shell: the dark track behind each model score. */
+    .bar-outer {
+      flex: 1;
+      height: 5px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+    }
+
+    /* Progress bar fill: the pink line showing model strength. */
+    .bar-inner {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 20px;
+    }
+
+    .bar-inner.dim {
+      background: rgba(255, 20, 147, 0.68);
+    }
+
+    /* Model bar widths: these set how full each model performance bar appears. */
+    .w-94 { width: 94%; }
+    .w-936 { width: 93.6%; }
+    .w-917 { width: 91.7%; }
+    .w-885 { width: 88.5%; }
+    .w-754 { width: 75.4%; }
+    .w-658 { width: 65.8%; }
+
+    .model-pct {
+      min-width: 62px;
+      color: var(--accent-bright);
+      font-family: 'Syne', sans-serif;
+      font-size: 0.96rem;
+      text-align: right;
+    }
+
+    .model-pct.dim {
+      color: var(--muted);
+    }
+
+    /* Model badges: labels such as Winner, Strong, Good, Weak. */
+    .model-badge {
+      padding: 4px 9px;
+      border-radius: 20px;
+      font-size: 0.74rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+    }
+
+    .mb-win { background: var(--accent); color: #27020f; }
+    .mb-good { background: rgba(183, 255, 159, 0.2); color: var(--green); border: 1px solid rgba(183, 255, 159, 0.42); }
+    .mb-ok { background: rgba(255, 217, 120, 0.2); color: var(--gold); border: 1px solid rgba(255, 217, 120, 0.42); }
+    .mb-weak { background: rgba(255, 143, 158, 0.2); color: var(--red); border: 1px solid rgba(255, 143, 158, 0.42); }
+
+    /* Feature importance: horizontal bars explaining which inputs matter most. */
+    .feature-section {
+      margin-top: 4rem;
+    }
+
+    .feature-section h3 {
+      margin-bottom: 0.75rem;
+      color: var(--text);
+      font-family: 'Syne', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+    }
+
+    .feat-importance {
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+      margin-top: 2.5rem;
+    }
+
+    .fi-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .fi-label {
+      min-width: 180px;
+      color: var(--muted);
+      font-size: 0.96rem;
+    }
+
+    .fi-bar-outer {
+      flex: 1;
+      height: 4px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+    }
+
+    .fi-bar-inner {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 20px;
+    }
+
+    /* Feature bar widths: these set how important each input looks in the chart. */
+    .fi-100 { width: 100%; }
+    .fi-98 { width: 98%; }
+    .fi-63 { width: 63%; }
+    .fi-41 { width: 41%; opacity: 0.65; }
+    .fi-37 { width: 37%; opacity: 0.5; }
+    .fi-29 { width: 29%; opacity: 0.4; }
+
+    .fi-val {
+      min-width: 48px;
+      color: var(--accent-bright);
+      font-family: 'Syne', sans-serif;
+      font-size: 0.9rem;
+      text-align: right;
+    }
+
+    /* Data banner: bold panel that summarizes the dataset cleanup. */
+    .data-banner {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 2rem;
+      align-items: center;
+      margin-top: 3rem;
+      padding: 3rem;
+      background: linear-gradient(135deg, rgba(255, 20, 147, 0.62), rgba(190, 45, 130, 0.72));
+      border: 1px solid var(--border-strong);
+      border-radius: 16px;
+    }
+
+    .data-banner h3 {
+      margin-bottom: 0.6rem;
+      color: var(--accent-bright);
+      font-family: 'Syne', sans-serif;
+      font-size: 1.9rem;
+      font-weight: 700;
+    }
+
+    .data-banner p {
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.8;
+    }
+
+    .banner-stats {
+      display: flex;
+      gap: 2.5rem;
+    }
+
+    .bs-item .n {
+      color: var(--accent-bright);
+      font-family: 'Syne', sans-serif;
+      font-size: 1.9rem;
+      font-weight: 700;
+    }
+
+    .bs-item .l {
+      margin-top: 2px;
+      color: var(--soft);
+      font-size: 0.82rem;
+      letter-spacing: 0.06em;
+    }
+
+    /* Feature grid: the four supporting project details under the data banner. */
+    .feat-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2.5rem;
+      margin-top: 3.5rem;
+    }
+
+    .feat-item {
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+
+    /* Outline list: used for research, insights, limitations, and future ideas. */
+    .outline-list {
+      display: grid;
+      gap: 1rem;
+      margin-top: 2.5rem;
+    }
+
+    .outline-item {
+      padding: 1.2rem 1.4rem;
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      box-shadow: 0 14px 36px rgba(255, 20, 147, 0.16);
+    }
+
+    .outline-item strong {
+      color: var(--accent-bright);
+    }
+
+    /* App rubric grid: placeholder cards for the four apps the group will evaluate. */
+    .app-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-top: 3rem;
+    }
+
+    .app-card {
+      padding: 1.5rem;
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      box-shadow: 0 14px 36px rgba(255, 20, 147, 0.16);
+    }
+
+    .app-card h4 {
+      color: var(--accent-bright);
+      font-size: 1.05rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .app-card p {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    /* Decision matrix: rubric table for scoring pregnancy risk apps. */
+    .matrix-table {
+      width: 100%;
+      margin-top: 2rem;
+      border-collapse: collapse;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--bg-panel);
+    }
+
+    .matrix-table th,
+    .matrix-table td {
+      padding: 1rem;
+      color: var(--muted);
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .matrix-table th {
+      color: var(--accent-bright);
+      background: rgba(255, 20, 147, 0.36);
+      font-weight: 700;
+    }
+
+    .matrix-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* Placeholder box: marks areas where drawings, screenshots, or final app names can be added later. */
+    .placeholder-box {
+      margin-top: 2rem;
+      padding: 2rem;
+      color: var(--muted);
+      background: repeating-linear-gradient(
+        135deg,
+        rgba(255, 20, 147, 0.3),
+        rgba(255, 20, 147, 0.3) 12px,
+        rgba(255, 255, 255, 0.1) 12px,
+        rgba(255, 255, 255, 0.1) 24px
+      );
+      border: 1px dashed var(--border-strong);
+      border-radius: 16px;
+    }
+
+    /* Team cards: profile cards with photo placeholders and social links. */
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.25rem;
+      margin-top: 3rem;
+    }
+
+    .team-card {
+      display: flex;
+      flex-direction: column;
+      min-height: 460px;
+      padding: 1.25rem;
+      text-align: left;
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      transition: border-color 0.3s ease, background 0.3s ease;
+      box-shadow: 0 14px 36px rgba(255, 20, 147, 0.16);
+    }
+
+    .team-card:hover {
+      background: var(--bg-panel-hover);
+      border-color: var(--border-strong);
+    }
+
+    /* Photo placeholder: replace this block with an img tag when you have real team photos. */
+    .team-photo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      margin-bottom: 1.75rem;
+      color: var(--accent-bright);
+      font-family: 'Syne', sans-serif;
+      font-size: 3rem;
+      font-weight: 700;
+      background:
+        radial-gradient(circle at 50% 38%, rgba(255, 255, 255, 0.18), transparent 22%),
+        linear-gradient(135deg, rgba(255, 20, 147, 0.72), rgba(82, 26, 67, 0.9));
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+    }
+
+    /* Team card text: name and project role/details. */
+    .team-info {
+      flex: 1;
+    }
+
+    .team-info h4 {
+      margin-bottom: 1rem;
+      color: var(--text);
+      font-size: 1.08rem;
+      font-weight: 600;
+    }
+
+    .team-role {
+      margin-bottom: 0.9rem;
+      color: var(--accent-bright);
+      font-size: 0.96rem;
+      font-weight: 700;
+      line-height: 1.55;
+    }
+
+    .team-note {
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.65;
+    }
+
+    /* Team links: clickable LinkedIn placeholder for each person. */
+    .team-links {
+      display: flex;
+      gap: 0.8rem;
+      margin-top: 1.5rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .team-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      color: var(--accent-bright);
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-decoration: none;
+      transition: background 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .team-link:hover {
+      background: var(--accent);
+      border-color: var(--accent-bright);
+      transform: translateY(-2px);
+    }
+
+    .team-link.linkedin {
+      font-family: Arial, sans-serif;
+      font-size: 1.3rem;
+    }
+
+    /* Footer: bottom credits and dataset source. */
+    footer {
+      padding: 2.5rem 3rem;
+      color: var(--muted);
+      text-align: center;
+      font-size: 0.9rem;
+      line-height: 2;
+      border-top: 1px solid var(--border);
+    }
+
+    footer strong {
+      color: var(--accent-bright);
+    }
+
+    /* Reveal animation classes: JavaScript adds .visible when a section scrolls into view. */
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.65s ease, transform 0.65s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Animation delays: lets cards and rows appear one after another. */
+    .d1 { transition-delay: 0.08s; }
+    .d2 { transition-delay: 0.16s; }
+    .d3 { transition-delay: 0.24s; }
+    .d4 { transition-delay: 0.32s; }
+
+    /* Tablet layout: stacks grids so content stays readable on narrower screens. */
+    @media (max-width: 900px) {
+      nav {
+        align-items: flex-start;
+        padding: 1.1rem 1.4rem;
+      }
+
+      .nav-links {
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 1rem;
+      }
+
+      .hero,
+      .section {
+        padding-left: 1.4rem;
+        padding-right: 1.4rem;
+      }
+
+      .hero-stats,
+      .banner-stats {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+      }
+
+      .cards3,
+      .feat-grid,
+      .data-banner,
+      .team-grid,
+      .app-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .model-row {
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 0.8rem;
+      }
+
+      .bar-outer {
+        flex-basis: 100%;
+      }
+    }
+
+    /* Phone layout: reduces oversized text and stacks rows vertically. */
+    @media (max-width: 620px) {
+      html {
+        font-size: 16px;
+      }
+
+      nav {
+        position: relative;
+        display: grid;
+      }
+
+      .nav-links {
+        justify-content: flex-start;
+      }
+
+      .hero {
+        min-height: auto;
+        padding-top: 5rem;
+      }
+
+      .hero-stats {
+        grid-template-columns: 1fr;
+      }
+
+      .fi-row {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 0.45rem;
+      }
+
+      .fi-label,
+      .fi-val {
+        min-width: auto;
+      }
+
+      .fi-bar-outer {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- HTML starts here: these elements are the actual page content. -->
+
+  <!-- Navigation: top links that jump to each required project section. -->
+  <nav>
+    <span class="nav-logo">TLP@UMD</span>
+    <ul class="nav-links">
+      <li><a href="#intro">Intro</a></li>
+      <li><a href="#background">Background</a></li>
+      <li><a href="#problem">Problem</a></li>
+      <li><a href="#mission">Mission</a></li>
+      <li><a href="#science">Data Science</a></li>
+      <li><a href="#insights">So What?</a></li>
+      <li><a href="#solution">Solution</a></li>
+      <li><a href="#conclusion">Conclusion</a></li>
+      <li><a href="#limitations">Limitations</a></li>
+      <li><a href="#future">Future</a></li>
+    </ul>
+    <span class="nav-pill">TLP</span>
+  </nav>
+
+  <!-- Introduction: first section visitors see. -->
+  <header id="intro" class="hero reveal visible">
+    <div class="hero-glow"></div>
+    <p class="hero-eyebrow">Introduction &nbsp;&middot;&nbsp; TLP@UMD</p>
+    <h1>Risk Signals.<br><span>Real</span><br>Standards.</h1>
+    <p class="hero-desc">A data-driven benchmark for evaluating pregnancy health apps that claim to identify high-risk and low-risk pregnancies. Instead of building another app, our project asks a sharper question: are existing apps looking at the risk factors that actually matter?</p>
+
+    <!-- Hero stats: quick proof points for the project. -->
+    <div class="hero-stats">
+      <div class="hstat"><div class="n">4</div><div class="l">Apps to evaluate</div></div>
+      <div class="hstat"><div class="n">6</div><div class="l">Models benchmarked</div></div>
+      <div class="hstat"><div class="n">2</div><div class="l">Top risk indicators</div></div>
+      <div class="hstat"><div class="n">1</div><div class="l">Rubric standard</div></div>
+    </div>
+  </header>
+
+  <!-- Marquee: scrolling project keywords. -->
+  <div class="marquee-wrap">
+    <div class="marquee-inner">
+      <span>Blood Sugar</span><span class="dot">&middot;</span>
+      <span>Gestational Diabetes</span><span class="dot">&middot;</span>
+      <span>Pregnancy Risk</span><span class="dot">&middot;</span>
+      <span>App Evaluation</span><span class="dot">&middot;</span>
+      <span>Rubric Design</span><span class="dot">&middot;</span>
+      <span>XGBoost</span><span class="dot">&middot;</span>
+      <span>Random Forest</span><span class="dot">&middot;</span>
+      <span>Decision Matrix</span><span class="dot">&middot;</span>
+      <span>Blood Sugar</span><span class="dot">&middot;</span>
+      <span>Gestational Diabetes</span><span class="dot">&middot;</span>
+      <span>Pregnancy Risk</span><span class="dot">&middot;</span>
+      <span>App Evaluation</span><span class="dot">&middot;</span>
+      <span>Rubric Design</span><span class="dot">&middot;</span>
+      <span>XGBoost</span><span class="dot">&middot;</span>
+      <span>Random Forest</span><span class="dot">&middot;</span>
+      <span>Decision Matrix</span><span class="dot">&middot;</span>
+    </div>
+  </div>
+
+  <hr class="ruled">
+
+  <!-- Background: research context for the topic. -->
+  <section id="background" class="section">
+    <p class="section-eyebrow reveal">Background</p>
+    <h2 class="section-title reveal d1">Pregnancy risk apps are useful only if they measure the right signals.</h2>
+    <p class="section-sub reveal d2">Digital maternal health tools are becoming more common, but not every app uses the same health inputs, explains risk clearly, or prioritizes clinically meaningful indicators. Our research focuses on how apps classify pregnancy risk and whether they account for indicators linked to high-risk outcomes.</p>
+
+    <div class="cards3">
+      <div class="card3 reveal d1">
+        <div class="card3-num">01</div>
+        <h3>Maternal risk is multifactorial</h3>
+        <p>Pregnancy risk can be shaped by blood sugar, gestational diabetes, blood pressure, BMI, age, medical history, and mental health factors.</p>
+      </div>
+      <div class="card3 reveal d2">
+        <div class="card3-num">02</div>
+        <h3>Apps vary in quality</h3>
+        <p>Some apps ask meaningful health questions, while others rely on generic wellness content that may not support risk awareness.</p>
+      </div>
+      <div class="card3 reveal d3">
+        <div class="card3-num">03</div>
+        <h3>Benchmarks create accountability</h3>
+        <p>A rubric makes it easier to compare apps fairly and identify which tools align best with data-backed pregnancy risk factors.</p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="ruled">
+
+  <!-- Problem Statement: clear project problem. -->
+  <section id="problem" class="section">
+    <p class="section-eyebrow reveal">Problem statement</p>
+    <h2 class="section-title reveal d1">Pregnancy apps may claim risk support without measuring the strongest indicators.</h2>
+    <p class="section-sub reveal d2">If an app labels users as high risk or low risk but ignores major indicators like blood sugar and gestational diabetes, its risk guidance may be incomplete. The problem is not that apps exist. The problem is that users and providers need a way to judge whether those apps are actually using meaningful risk signals.</p>
+  </section>
+
+  <hr class="ruled">
+
+  <!-- Mission, Vision, and Impact: states what the project is trying to do. -->
+  <section id="mission" class="section">
+    <p class="section-eyebrow reveal">Mission, vision, impact</p>
+    <h2 class="section-title reveal d1">Turn model results into a practical app-grading standard.</h2>
+    <div class="outline-list">
+      <div class="outline-item reveal d1"><strong>Mission:</strong> Create a rubric that evaluates how well pregnancy health apps identify and communicate high-risk and low-risk pregnancy factors.</div>
+      <div class="outline-item reveal d2"><strong>Vision:</strong> Help patients, providers, and designers recognize which apps are data-aware, transparent, and useful for maternal health decision support.</div>
+      <div class="outline-item reveal d3"><strong>Impact:</strong> Make app evaluation clearer by comparing app features against the strongest indicators found in our data science analysis.</div>
+    </div>
+  </section>
+
+  <hr class="ruled">
+
+  <!-- Data Science section: dataset, wrangling, cleaning, models, and results. -->
+  <section id="science" class="section">
+    <p class="section-eyebrow reveal">Data science</p>
+    <h2 class="section-title reveal d1">Our dataset becomes the benchmark for grading apps.</h2>
+    <p class="section-sub reveal d2">We used the Maternal Health Risk Assessment Dataset from Mendeley Data (Mojumdar et al., 2024) to identify which variables were most useful for predicting pregnancy risk. The cleaned dataset and model results shaped the rubric criteria.</p>
+
+    <!-- Data banner: strongest visual callout in the data section. -->
+    <div class="data-banner reveal d1">
+      <div>
+        <h3>Benchmark dataset and cleaning plan</h3>
+        <p>Placeholder: explain the final number of rows, removed rows, missing values, impossible values, label cleanup, train-test split, and any encoding or scaling decisions. Keep this section factual once your final notebook is locked.</p>
+      </div>
+      <div class="banner-stats">
+        <div class="bs-item"><div class="n">1,184</div><div class="l">Clean records</div></div>
+        <div class="bs-item"><div class="n">21</div><div class="l">Rows removed</div></div>
+        <div class="bs-item"><div class="n">0</div><div class="l">Nulls left</div></div>
+      </div>
+    </div>
+
+    <!-- Model rows: each bar width matches the displayed recall score. -->
+    <div class="model-block reveal d2">
+      <div class="model-row winner">
+        <span class="model-name">XGBoost</span>
+        <div class="bar-outer"><div class="bar-inner w-94"></div></div>
+        <span class="model-pct">94.05%</span>
+        <span class="model-badge mb-win">Best</span>
+      </div>
+      <div class="model-row">
+        <span class="model-name">Random Forest</span>
+        <div class="bar-outer"><div class="bar-inner w-936"></div></div>
+        <span class="model-pct">93.63%</span>
+        <span class="model-badge mb-good">Strong</span>
+      </div>
+      <div class="model-row">
+        <span class="model-name dim">Decision Tree</span>
+        <div class="bar-outer"><div class="bar-inner dim w-917"></div></div>
+        <span class="model-pct dim">91.71%</span>
+        <span class="model-badge mb-ok">Good</span>
+      </div>
+      <div class="model-row">
+        <span class="model-name dim">Logistic Regression</span>
+        <div class="bar-outer"><div class="bar-inner dim w-885"></div></div>
+        <span class="model-pct dim">88.52%</span>
+        <span class="model-badge mb-ok">Adequate</span>
+      </div>
+      <div class="model-row">
+        <span class="model-name dim">KNN</span>
+        <div class="bar-outer"><div class="bar-inner dim w-754"></div></div>
+        <span class="model-pct dim">75.36%</span>
+        <span class="model-badge mb-weak">Weak</span>
+      </div>
+      <div class="model-row">
+        <span class="model-name dim">SVM</span>
+        <div class="bar-outer"><div class="bar-inner dim w-658"></div></div>
+        <span class="model-pct dim">65.81%</span>
+        <span class="model-badge mb-weak">Weakest</span>
+      </div>
+    </div>
+
+    <div class="feature-section">
+      <p class="section-eyebrow reveal">Feature importance</p>
+      <h3 class="reveal d1">Blood sugar and gestational diabetes drive the rubric.</h3>
+      <p class="section-sub reveal d2">Our analysis showed that Blood Sugar and Gestational Diabetes were the strongest indicators for distinguishing high-risk and low-risk pregnancy categories. That means apps should be scored heavily on whether they collect, explain, and respond to those factors.</p>
+      <div class="feat-importance reveal d3">
+        <div class="fi-row"><span class="fi-label">Blood Sugar</span><div class="fi-bar-outer"><div class="fi-bar-inner fi-100"></div></div><span class="fi-val">0.238</span></div>
+        <div class="fi-row"><span class="fi-label">Gestational Diabetes</span><div class="fi-bar-outer"><div class="fi-bar-inner fi-98"></div></div><span class="fi-val">0.234</span></div>
+        <div class="fi-row"><span class="fi-label">Mental Health</span><div class="fi-bar-outer"><div class="fi-bar-inner fi-63"></div></div><span class="fi-val">0.150</span></div>
+        <div class="fi-row"><span class="fi-label">Preexisting Diabetes</span><div class="fi-bar-outer"><div class="fi-bar-inner fi-41"></div></div><span class="fi-val">0.097</span></div>
+        <div class="fi-row"><span class="fi-label">Heart Rate</span><div class="fi-bar-outer"><div class="fi-bar-inner fi-37"></div></div><span class="fi-val">0.089</span></div>
+        <div class="fi-row"><span class="fi-label">BMI</span><div class="fi-bar-outer"><div class="fi-bar-inner fi-29"></div></div><span class="fi-val">0.068</span></div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="ruled">
+
+  <!-- So What section: explains what the group learned from the analysis. -->
+  <section id="insights" class="section">
+    <p class="section-eyebrow reveal">So what?</p>
+    <h2 class="section-title reveal d1">The analysis gives us a way to judge app quality.</h2>
+    <div class="outline-list">
+      <div class="outline-item reveal d1"><strong>Insight 1:</strong> Apps that ignore blood sugar or gestational diabetes should lose major rubric points because those were the strongest risk indicators in our benchmark.</div>
+      <div class="outline-item reveal d2"><strong>Insight 2:</strong> A good app should not only ask for health inputs; it should explain why those inputs matter for risk classification.</div>
+      <div class="outline-item reveal d3"><strong>Insight 3:</strong> The best apps should be transparent about limitations and should encourage users to follow up with medical professionals.</div>
+      <div class="outline-item reveal d4"><strong>Insight 4:</strong> Our work shifts the project from prediction alone to evaluation: we are grading how responsibly apps use pregnancy risk data.</div>
+    </div>
+  </section>
+
+  <hr class="ruled">
+
+  <!-- Proposed Solution section: rubric, app placeholders, concept drawing, and decision matrix. -->
+  <section id="solution" class="section">
+    <p class="section-eyebrow reveal">Proposed solution</p>
+    <h2 class="section-title reveal d1">A rubric for grading pregnancy risk prediction apps.</h2>
+    <p class="section-sub reveal d2">We will evaluate four existing apps using our dataset as the benchmark for what a strong risk-aware app should consider. The rubric will score whether each app captures high-impact indicators, communicates risk clearly, and supports responsible next steps.</p>
+
+    <!-- App cards: replace placeholder names with the final four apps. -->
+    <div class="app-grid">
+      <div class="app-card reveal d1"><h4>App 1 Placeholder</h4><p>Add app name, screenshots, key features, and whether it asks about blood sugar or gestational diabetes.</p></div>
+      <div class="app-card reveal d2"><h4>App 2 Placeholder</h4><p>Add app name, screenshots, key features, and whether it explains high-risk or low-risk classifications.</p></div>
+      <div class="app-card reveal d3"><h4>App 3 Placeholder</h4><p>Add app name, screenshots, key features, and whether it gives clear medical follow-up guidance.</p></div>
+      <div class="app-card reveal d4"><h4>App 4 Placeholder</h4><p>Add app name, screenshots, key features, and overall rubric score once evaluation is complete.</p></div>
+    </div>
+
+    <!-- Concept drawing placeholder: add rubric mockup or app-evaluation workflow image here. -->
+    <div class="placeholder-box reveal d1">
+      <strong>Concept drawing placeholder:</strong> Add a sketch, prototype screen, or flow diagram showing how the rubric works. Example: user selects an app, the rubric checks risk inputs, and the app receives a final score.
+    </div>
+
+    <!-- Decision matrix: starting scoring categories for app evaluation. -->
+    <table class="matrix-table reveal d2">
+      <thead>
+        <tr>
+          <th>Rubric category</th>
+          <th>Why it matters</th>
+          <th>Suggested weight</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Blood sugar tracking</td>
+          <td>Top indicator in our feature importance results.</td>
+          <td>25%</td>
+        </tr>
+        <tr>
+          <td>Gestational diabetes screening</td>
+          <td>Nearly tied with blood sugar as a top predictor.</td>
+          <td>25%</td>
+        </tr>
+        <tr>
+          <td>Risk explanation clarity</td>
+          <td>Users should understand why an app marks them high risk or low risk.</td>
+          <td>20%</td>
+        </tr>
+        <tr>
+          <td>Medical follow-up guidance</td>
+          <td>Apps should support care-seeking behavior, not replace clinicians.</td>
+          <td>15%</td>
+        </tr>
+        <tr>
+          <td>Privacy, accessibility, and usability</td>
+          <td>Risk tools must be understandable, safe, and easy to use.</td>
+          <td>15%</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <hr class="ruled">
+
+  <!-- Conclusion: wraps up the argument. -->
+  <section id="conclusion" class="section">
+    <p class="section-eyebrow reveal">Conclusion</p>
+    <h2 class="section-title reveal d1">A good maternal health app should match the evidence.</h2>
+    <p class="section-sub reveal d2">Our project uses data science to move beyond general opinions about pregnancy apps. By turning model insights into a rubric, we can evaluate whether apps meaningfully address the indicators most connected to high-risk and low-risk pregnancy classification.</p>
+  </section>
+
+  <hr class="ruled">
+
+  <!-- Limitations: honest project constraints. -->
+  <section id="limitations" class="section">
+    <p class="section-eyebrow reveal">Limitations</p>
+    <h2 class="section-title reveal d1">What our project cannot prove yet.</h2>
+    <div class="outline-list">
+      <div class="outline-item reveal d1"><strong>Dataset scope:</strong> The benchmark depends on one dataset, so results may not represent every population or clinical setting.</div>
+      <div class="outline-item reveal d2"><strong>App access:</strong> Some apps may hide features behind accounts, subscriptions, or region-specific settings.</div>
+      <div class="outline-item reveal d3"><strong>Medical validation:</strong> Our rubric evaluates app quality, but it does not certify an app as clinically safe or medically approved.</div>
+      <div class="outline-item reveal d4"><strong>Placeholder:</strong> Add any model limitations from your notebook, such as class balance, feature availability, or overfitting risk.</div>
+    </div>
+  </section>
+
+  <hr class="ruled">
+
+  <!-- Future Considerations: what could happen next. -->
+  <section id="future" class="section">
+    <p class="section-eyebrow reveal">Future considerations</p>
+    <h2 class="section-title reveal d1">Next steps for a stronger benchmark.</h2>
+    <div class="feat-grid">
+      <div class="feat-item reveal d1">
+        <h4>Evaluate more apps</h4>
+        <p>Expand beyond four apps to see whether patterns hold across the pregnancy health app market.</p>
+      </div>
+      <div class="feat-item reveal d2">
+        <h4>Add expert review</h4>
+        <p>Ask clinicians or maternal health researchers to review rubric weights and suggest missing criteria.</p>
+      </div>
+      <div class="feat-item reveal d3">
+        <h4>Test usability</h4>
+        <p>Compare whether users can understand each app's risk language, warnings, and next-step recommendations.</p>
+      </div>
+      <div class="feat-item reveal d4">
+        <h4>Build a rubric prototype</h4>
+        <p>Create a simple scoring tool where users can enter app features and receive a benchmark-based grade.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Team section: lists project contributors. -->
+  <section id="team" class="section">
+    <p class="section-eyebrow reveal">The team</p>
+    <h2 class="section-title reveal d1">Built by Team<br>Pregnant Women.</h2>
+    <p class="section-sub reveal d2">University of Maryland engineering students in the Technical Leadership Program, Spring 2026.</p>
+    <div class="team-grid">
+      <article class="team-card reveal d1">
+        <div class="team-photo">G</div>
+        <div class="team-info">
+          <h4>Gabby</h4>
+          <p class="team-role">Project role placeholder</p>
+          <p class="team-note">Add a short bio, contribution, or research focus here. Replace the photo block with Gabby's picture when ready.</p>
+        </div>
+        <div class="team-links" aria-label="Gabby links">
+          <a class="team-link linkedin" href="#" aria-label="Gabby LinkedIn page">in</a>
+        </div>
+      </article>
+
+      <article class="team-card reveal d2">
+        <div class="team-photo">E</div>
+        <div class="team-info">
+          <h4>Ellie</h4>
+          <p class="team-role">Project role placeholder</p>
+          <p class="team-note">Add a short bio, contribution, or research focus here. Replace the photo block with Ellie's picture when ready.</p>
+        </div>
+        <div class="team-links" aria-label="Ellie links">
+          <a class="team-link linkedin" href="#" aria-label="Ellie LinkedIn page">in</a>
+        </div>
+      </article>
+
+      <article class="team-card reveal d3">
+        <div class="team-photo">S</div>
+        <div class="team-info">
+          <h4>Santiago</h4>
+          <p class="team-role">Project role placeholder</p>
+          <p class="team-note">Add a short bio, contribution, or research focus here. Replace the photo block with Santiago's picture when ready.</p>
+        </div>
+        <div class="team-links" aria-label="Santiago links">
+          <a class="team-link linkedin" href="#" aria-label="Santiago LinkedIn page">in</a>
+        </div>
+      </article>
+
+      <article class="team-card reveal d4">
+        <div class="team-photo">D</div>
+        <div class="team-info">
+          <h4>Dwayne</h4>
+          <p class="team-role">Project role placeholder</p>
+          <p class="team-note">Add a short bio, contribution, or research focus here. Replace the photo block with Dwayne's picture when ready.</p>
+        </div>
+        <div class="team-links" aria-label="Dwayne links">
+          <a class="team-link linkedin" href="#" aria-label="Dwayne LinkedIn page">in</a>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- Footer: final project credit and dataset citation. -->
+  <footer>
+    <strong>TLP@UMD</strong> &nbsp;&middot;&nbsp; Pregnancy App Rubric Benchmark &nbsp;&middot;&nbsp; Spring 2026<br>
+    Dataset: Mojumdar et al. (2024), Mendeley Data, CC BY 4.0
+  </footer>
+
+  <!-- JavaScript starts here: this controls small page interactions. -->
+  <script>
+    // Reveal observer: watches hidden elements and shows them when they enter the screen.
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        // If the element is visible on screen, add the CSS class that fades it in.
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, {
+      threshold: 0.1,                 // Starts the animation once 10% of the element is visible.
+      rootMargin: '0px 0px -30px 0px' // Starts a little before the element reaches the bottom.
+    });
+
+    // Attach the reveal animation to every element with class="reveal".
+    document.querySelectorAll('.reveal').forEach((element) => {
+      revealObserver.observe(element);
+    });
+  </script>
+</body>
+</html>
